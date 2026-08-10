@@ -6958,6 +6958,37 @@ def test_stream_mode_messages_command() -> None:
     ]
 
 
+def test_declared_node_subgraphs() -> None:
+    class State(TypedDict):
+        kind: str
+
+    child = (
+        StateGraph(State)
+        .add_node("child", lambda state: state)
+        .add_edge(START, "child")
+        .compile()
+    )
+
+    class Router:
+        def __init__(self, graphs: dict[str, Any]) -> None:
+            self.graphs = graphs
+
+        def __call__(self, state: State) -> State:
+            return self.graphs[state["kind"]].invoke(state)
+
+    graph = (
+        StateGraph(State)
+        .add_node("router", Router({"child": child}), subgraphs=[child])
+        .add_edge(START, "router")
+        .compile()
+    )
+
+    assert graph.nodes["router"].subgraphs == [child]
+    assert list(graph.get_subgraphs()) == [("router", child)]
+    assert list(graph.get_subgraphs(namespace="router")) == [("router", child)]
+    assert "router:child" in graph.get_graph(xray=True).nodes
+
+
 def test_node_destinations() -> None:
     class State(TypedDict):
         foo: Annotated[str, operator.add]

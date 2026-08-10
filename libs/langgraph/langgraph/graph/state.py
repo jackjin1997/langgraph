@@ -74,6 +74,7 @@ from langgraph.pregel._write import (
     ChannelWriteEntry,
     ChannelWriteTupleEntry,
 )
+from langgraph.pregel.protocol import PregelProtocol
 from langgraph.types import (
     All,
     CachePolicy,
@@ -299,6 +300,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
         input_schema: None = None,
         retry_policy: RetryPolicy | Sequence[RetryPolicy] | None = None,
         cache_policy: CachePolicy | None = None,
+        subgraphs: Sequence[PregelProtocol] | None = None,
         destinations: dict[str, str] | tuple[str, ...] | None = None,
         **kwargs: Unpack[DeprecatedKwargs],
     ) -> Self:
@@ -315,6 +317,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
 
                 If a sequence is provided, the first matching policy will be applied.
             cache_policy: The cache policy for the node.
+            subgraphs: Subgraphs invoked by the node, used for observability.
             destinations: Destinations that indicate where a node can route to.
 
                 Useful for edgeless graphs with nodes that return `Command` objects.
@@ -366,6 +369,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
         input_schema: type[NodeInputT],
         retry_policy: RetryPolicy | Sequence[RetryPolicy] | None = None,
         cache_policy: CachePolicy | None = None,
+        subgraphs: Sequence[PregelProtocol] | None = None,
         destinations: dict[str, str] | tuple[str, ...] | None = None,
         **kwargs: Unpack[DeprecatedKwargs],
     ) -> Self:
@@ -382,6 +386,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
 
                 If a sequence is provided, the first matching policy will be applied.
             cache_policy: The cache policy for the node.
+            subgraphs: Subgraphs invoked by the node, used for observability.
             destinations: Destinations that indicate where a node can route to.
 
                 Useful for edgeless graphs with nodes that return `Command` objects.
@@ -438,6 +443,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
         input_schema: None = None,
         retry_policy: RetryPolicy | Sequence[RetryPolicy] | None = None,
         cache_policy: CachePolicy | None = None,
+        subgraphs: Sequence[PregelProtocol] | None = None,
         destinations: dict[str, str] | tuple[str, ...] | None = None,
         **kwargs: Unpack[DeprecatedKwargs],
     ) -> Self:
@@ -453,6 +459,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
 
                 If a sequence is provided, the first matching policy will be applied.
             cache_policy: The cache policy for the node.
+            subgraphs: Subgraphs invoked by the node, used for observability.
             destinations: Destinations that indicate where a node can route to.
 
                 Useful for edgeless graphs with nodes that return `Command` objects.
@@ -505,6 +512,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
         input_schema: type[NodeInputT],
         retry_policy: RetryPolicy | Sequence[RetryPolicy] | None = None,
         cache_policy: CachePolicy | None = None,
+        subgraphs: Sequence[PregelProtocol] | None = None,
         destinations: dict[str, str] | tuple[str, ...] | None = None,
         **kwargs: Unpack[DeprecatedKwargs],
     ) -> Self:
@@ -524,6 +532,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
 
                 If a sequence is provided, the first matching policy will be applied.
             cache_policy: The cache policy for the node.
+            subgraphs: Subgraphs invoked by the node, used for observability.
             destinations: Destinations that indicate where a node can route to.
 
                 Useful for edgeless graphs with nodes that return `Command` objects.
@@ -579,6 +588,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
         input_schema: type[NodeInputT] | None = None,
         retry_policy: RetryPolicy | Sequence[RetryPolicy] | None = None,
         cache_policy: CachePolicy | None = None,
+        subgraphs: Sequence[PregelProtocol] | None = None,
         destinations: dict[str, str] | tuple[str, ...] | None = None,
         **kwargs: Unpack[DeprecatedKwargs],
     ) -> Self:
@@ -598,6 +608,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
 
                 If a sequence is provided, the first matching policy will be applied.
             cache_policy: The cache policy for the node.
+            subgraphs: Subgraphs invoked by the node, used for observability.
             destinations: Destinations that indicate where a node can route to.
 
                 Useful for edgeless graphs with nodes that return `Command` objects.
@@ -755,6 +766,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
                 input_schema=input_schema,
                 retry_policy=retry_policy,
                 cache_policy=cache_policy,
+                subgraphs=() if subgraphs is None else subgraphs,
                 ends=ends,
                 defer=defer,
             )
@@ -765,6 +777,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
                 input_schema=inferred_input_schema,
                 retry_policy=retry_policy,
                 cache_policy=cache_policy,
+                subgraphs=() if subgraphs is None else subgraphs,
                 ends=ends,
                 defer=defer,
             )
@@ -775,6 +788,7 @@ class StateGraph(Generic[StateT, ContextT, InputT, OutputT]):
                 input_schema=self.state_schema,
                 retry_policy=retry_policy,
                 cache_policy=cache_policy,
+                subgraphs=() if subgraphs is None else subgraphs,
                 ends=ends,
                 defer=defer,
             )
@@ -1331,6 +1345,7 @@ class CompiledStateGraph(
                 metadata=node.metadata,
                 retry_policy=node.retry_policy,
                 cache_policy=node.cache_policy,
+                subgraphs=node.subgraphs,
                 bound=node.runnable,  # type: ignore[arg-type]
             )
         else:

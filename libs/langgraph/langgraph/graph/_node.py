@@ -8,6 +8,7 @@ from langchain_core.runnables import Runnable, RunnableConfig
 from langgraph.store.base import BaseStore
 
 from langgraph._internal._typing import EMPTY_SEQ
+from langgraph.pregel.protocol import PregelProtocol
 from langgraph.runtime import Runtime
 from langgraph.types import CachePolicy, RetryPolicy, StreamWriter
 from langgraph.typing import ContextT, NodeInputT, NodeInputT_contra
@@ -88,5 +89,6 @@ class StateNodeSpec(Generic[NodeInputT, ContextT]):
     input_schema: type[NodeInputT]
     retry_policy: RetryPolicy | Sequence[RetryPolicy] | None
     cache_policy: CachePolicy | None
+    subgraphs: Sequence[PregelProtocol] = ()
     ends: tuple[str, ...] | dict[str, str] | None = EMPTY_SEQ
     defer: bool = False
