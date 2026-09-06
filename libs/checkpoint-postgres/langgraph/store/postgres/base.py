@@ -450,6 +450,10 @@ class BasePostgresStore(Generic[C]):
             filter_clauses = []
             if op.filter:
                 for key, value in op.filter.items():
+                    if key.startswith("$"):
+                        raise ValueError(
+                            f"Unsupported top-level filter operator: '{key}'"
+                        )
                     if isinstance(value, dict):
                         for op_name, val in value.items():
                             condition, params_ = self._get_filter_condition(

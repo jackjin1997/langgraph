@@ -251,6 +251,8 @@ class SearchOp(NamedTuple):
     """Key-value pairs for filtering results based on exact matches or comparison operators.
 
     The filter supports both exact matches and operator-based comparisons.
+    Top-level keys must be field names; boolean combinators such as `$and` and `$or`
+    are not supported.
 
     Supported Operators:
         - `$eq`: Equal to (same as direct value comparison)

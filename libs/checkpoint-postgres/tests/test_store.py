@@ -148,6 +148,23 @@ def test_batch_order(store: PostgresStore) -> None:
     assert results_reordered[4].key == "key1"
 
 
+def test_search_rejects_top_level_filter_operators() -> None:
+    store = object.__new__(PostgresStore)
+    store.index_config = None
+    store.ttl_config = None
+    op = SearchOp(
+        namespace_prefix=("test",),
+        filter={"$and": [{"score": {"$gt": 3}}]},
+        limit=10,
+        offset=0,
+    )
+
+    with pytest.raises(
+        ValueError, match=r"Unsupported top-level filter operator: '\$and'"
+    ):
+        store._prepare_batch_search_queries([(0, op)])
+
+
 def test_batch_get_ops(store: PostgresStore) -> None:
     # Setup test data
     store.put(("test",), "key1", {"data": "value1"})

@@ -239,6 +239,11 @@ class InMemoryStore(BaseStore):
         """Filter items by namespace and filter function, return items with their embeddings."""
         namespace_prefix = op.namespace_prefix
 
+        if op.filter:
+            for key in op.filter:
+                if key.startswith("$"):
+                    raise ValueError(f"Unsupported top-level filter operator: '{key}'")
+
         def filter_func(item: Item) -> bool:
             if not op.filter:
                 return True

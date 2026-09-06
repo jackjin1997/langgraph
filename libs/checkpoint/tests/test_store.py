@@ -808,6 +808,24 @@ async def test_async_vector_search_with_filters(
     assert results[0].key == "doc3"
 
 
+def test_search_rejects_top_level_filter_operators() -> None:
+    store = InMemoryStore()
+
+    with pytest.raises(
+        ValueError, match=r"Unsupported top-level filter operator: '\$and'"
+    ):
+        store.search(("test",), filter={"$and": [{"score": {"$gt": 3}}]})
+
+
+async def test_async_search_rejects_top_level_filter_operators() -> None:
+    store = InMemoryStore()
+
+    with pytest.raises(
+        ValueError, match=r"Unsupported top-level filter operator: '\$or'"
+    ):
+        await store.asearch(("test",), filter={"$or": [{"color": "red"}]})
+
+
 async def test_async_batched_vector_search_concurrent(
     fake_embeddings: CharacterEmbeddings,
 ) -> None:
